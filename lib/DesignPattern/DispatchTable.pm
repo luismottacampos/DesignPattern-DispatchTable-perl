@@ -53,7 +53,8 @@ $condition => $code_ref >> pairs to be installed in the Dispatch Table.
 sub new {
     my $class = shift;
     my $self = bless [], $class;
-    $self->register(@_) if @_;
+    eval { $self->register(@_) } if @_;
+    die if $@;
     return $self;
 }
 
@@ -79,13 +80,17 @@ sub register {
     my $self = shift;
     my @new_handlers;
     while ( my ( $decision, $handler ) = splice @_, 0, 2 ) {
+        die 'Handler for decision ('
+          . $decision
+          . " ) is not CODE. Did you pass less arguments than you should?\n"
+          unless UNIVERSAL::isa( $handler, ' CODE ' );
         return 0
           unless defined( ref $decision )
-              || (   UNIVERSAL::isa( $decision, 'Regexp' )
-                  || UNIVERSAL::isa( $decision, 'CODE' ) );
+              || (   UNIVERSAL::isa( $decision, ' Regexp ' )
+                  || UNIVERSAL::isa( $decision, ' CODE ' ) );
         push @new_handlers,
           {
-            type => ref $decision || 'STRING',
+            type => ref $decision || ' STRING ',
             decision => $decision,
             handler  => $handler
           };
@@ -112,9 +117,9 @@ handler.
 sub call {
     my ( $self,    $argument )  = @_;
     my ( $handler, @arguments ) = $self->code_for($argument);
-    my @return_value = eval { $handler->(@arguments) };
+    my $return_value = eval { $handler->(@arguments) };
     die qq{Error calling handler for $argument: $@} if $@;
-    return @return_value;
+    return $return_value;
 }
 
 =head2 code_for
@@ -131,15 +136,15 @@ sub code_for {
         my @results;
 
        # TODO: Find a way to implement this as a DesignPattern::DispatchTable :)
-        if ( $entry->{type} eq 'STRING' && $entry->{decision} eq $argument ) {
+        if ( $entry->{type} eq ' STRING ' && $entry->{decision} eq $argument ) {
             return $entry->{handler}, ();
         }
-        elsif ( $entry->{type} eq 'Regexp'
-            && ( @results = $argument =~ m{$$entry{decision}} ) )
+        elsif ( $entry->{type} eq ' Regexp '
+            && ( @results = $argument =~ m{$$entry{decision}}ms ) )
         {
             return $entry->{handler}, @results;
         }
-        elsif ($entry->{type} eq 'CODE'
+        elsif ($entry->{type} eq ' CODE '
             && ( @results = $entry->{handler}->($argument) )
             && @results )
         {
@@ -155,11 +160,9 @@ Luis Motta Campos, C<< <lmc at cpan.org> >>
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-designpattern-dispatchtable at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DesignPattern-DispatchTable>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-
-
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DesignPattern-DispatchTable>.  I will be notified, and then you'
+          ll automatically be notified of progress on your bug as I make changes
+          .
 
 =head1 SUPPORT
 
