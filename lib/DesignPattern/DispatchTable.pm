@@ -13,7 +13,7 @@ Version 0.01
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
@@ -36,12 +36,7 @@ readability, organisation, better coding style, and fun.
     # and then you might call:
     $dispatch_table->call($argument);    # calls the first matching method
 
-=head1 EXPORT
-
-A list of functions that can be exported.  You can delete this section
-if you don't export anything, such as for a purely object-oriented module.
-
-=head1 FUNCTIONS
+=head1 METHODS
 
 =head2 new
 
