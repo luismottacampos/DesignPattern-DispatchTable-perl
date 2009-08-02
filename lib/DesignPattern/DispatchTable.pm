@@ -80,17 +80,17 @@ sub register {
     my $self = shift;
     my @new_handlers;
     while ( my ( $decision, $handler ) = splice @_, 0, 2 ) {
-        die 'Handler for decision ('
+        die q{Handler for decision "}
           . $decision
-          . " ) is not CODE. Did you pass less arguments than you should?\n"
-          unless UNIVERSAL::isa( $handler, ' CODE ' );
+          . qq{" is not CODE. Did you pass less arguments than you should?\n}
+          unless UNIVERSAL::isa( $handler, 'CODE' );
         return 0
           unless defined( ref $decision )
-              || (   UNIVERSAL::isa( $decision, ' Regexp ' )
-                  || UNIVERSAL::isa( $decision, ' CODE ' ) );
+              || (   UNIVERSAL::isa( $decision, 'Regexp' )
+                  || UNIVERSAL::isa( $decision, 'CODE' ) );
         push @new_handlers,
           {
-            type => ref $decision || ' STRING ',
+            type => ref $decision || 'STRING',
             decision => $decision,
             handler  => $handler
           };
@@ -136,15 +136,15 @@ sub code_for {
         my @results;
 
        # TODO: Find a way to implement this as a DesignPattern::DispatchTable :)
-        if ( $entry->{type} eq ' STRING ' && $entry->{decision} eq $argument ) {
+        if ( $entry->{type} eq 'STRING' && $entry->{decision} eq $argument ) {
             return $entry->{handler}, ();
         }
-        elsif ( $entry->{type} eq ' Regexp '
+        elsif ( $entry->{type} eq 'Regexp'
             && ( @results = $argument =~ m{$$entry{decision}}ms ) )
         {
             return $entry->{handler}, @results;
         }
-        elsif ($entry->{type} eq ' CODE '
+        elsif ($entry->{type} eq 'CODE'
             && ( @results = $entry->{handler}->($argument) )
             && @results )
         {

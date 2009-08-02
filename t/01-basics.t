@@ -1,4 +1,4 @@
-use Test::More qw( no_plan );
+use Test::More tests => 10;
 
 BEGIN { our $class = 'DesignPattern::DispatchTable'; use_ok $class; }
 
